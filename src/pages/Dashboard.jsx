@@ -17,6 +17,7 @@ export default function Dashboard() {
   const loadStats = async () => {
     try {
       const members = await memberService.getAll();
+      console.log('Membros carregados para estatísticas:', members);
       const total = members.length;
       const ativos = members.filter(m => m.status === 'Ativo').length;
       const inativos = members.filter(m => m.status === 'Inativo').length;
@@ -56,6 +57,7 @@ export default function Dashboard() {
   const loadFinanceStats = async () => {
     try {
       const transactions = await financeService.getAll();
+      console.log('Transações carregadas para estatísticas financeiras:', transactions);
       const today = new Date();
       const currentMonth = today.getMonth() + 1;
       const currentYear = today.getFullYear();
