@@ -7,25 +7,48 @@ export default function Dashboard() {
   const [stats, setStats] = useState({ total: 0, ativos: 0, inativos: 0, visitantes: 0 });
   const [birthdays, setBirthdays] = useState([]);
   const [financeStats, setFinanceStats] = useState({ income: 0, expenses: 0, balance: 0 });
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    loadStats();
-    loadBirthdays();
-    loadFinanceStats();
+    loadAllData();
   }, []);
+
+  const loadAllData = async () => {
+    setLoading(true);
+    try {
+      await Promise.all([
+        loadStats(),
+        loadBirthdays(),
+        loadFinanceStats()
+      ]);
+    } catch (error) {
+      console.error('Erro ao carregar dados do dashboard:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const loadStats = async () => {
     try {
       const members = await memberService.getAll();
       console.log('Membros carregados para estatísticas:', members);
+      
+      if (!members || members.length === 0) {
+        console.warn('Nenhum membro encontrado');
+        setStats({ total: 0, ativos: 0, inativos: 0, visitantes: 0 });
+        return;
+      }
+
       const total = members.length;
       const ativos = members.filter(m => m.status === 'Ativo').length;
       const inativos = members.filter(m => m.status === 'Inativo').length;
       const visitantes = members.filter(m => m.status === 'Visitante').length;
 
+      console.log('Estatísticas calculadas:', { total, ativos, inativos, visitantes });
       setStats({ total, ativos, inativos, visitantes });
     } catch (error) {
       console.error('Erro ao carregar estatísticas:', error);
+      setStats({ total: 0, ativos: 0, inativos: 0, visitantes: 0 });
     }
   };
 
@@ -33,7 +56,7 @@ export default function Dashboard() {
     try {
       const members = await memberService.getAll();
       const today = new Date();
-      const currentMonth = today.getMonth() + 1; // Janeiro é 0
+      const currentMonth = today.getMonth() + 1;
 
       const birthdays = members
         .filter(m => m.birthdate)
@@ -46,18 +69,26 @@ export default function Dashboard() {
           };
         })
         .filter(m => m.birthMonth === currentMonth)
-        .sort((a, b) => a.birthDay - b.birthDay); // Ordena por dia
+        .sort((a, b) => a.birthDay - b.birthDay);
 
       setBirthdays(birthdays);
     } catch (error) {
       console.error('Erro ao carregar aniversariantes:', error);
+      setBirthdays([]);
     }
   };
 
   const loadFinanceStats = async () => {
     try {
       const transactions = await financeService.getAll();
-      console.log('Transações carregadas para estatísticas financeiras:', transactions);
+      console.log('Transações carregadas:', transactions);
+
+      if (!transactions || transactions.length === 0) {
+        console.warn('Nenhuma transação encontrada');
+        setFinanceStats({ income: 0, expenses: 0, balance: 0 });
+        return;
+      }
+
       const today = new Date();
       const currentMonth = today.getMonth() + 1;
       const currentYear = today.getFullYear();
@@ -67,6 +98,8 @@ export default function Dashboard() {
         const date = new Date(t.date);
         return date.getMonth() + 1 === currentMonth && date.getFullYear() === currentYear;
       });
+
+      console.log('Transações do mês atual:', currentMonthTransactions);
 
       const totalIncome = currentMonthTransactions
         .filter(t => t.type === 'income')
@@ -78,9 +111,11 @@ export default function Dashboard() {
 
       const balance = totalIncome - totalExpenses;
 
+      console.log('Estatísticas financeiras:', { totalIncome, totalExpenses, balance });
       setFinanceStats({ income: totalIncome, expenses: totalExpenses, balance });
     } catch (error) {
       console.error('Erro ao carregar estatísticas financeiras:', error);
+      setFinanceStats({ income: 0, expenses: 0, balance: 0 });
     }
   };
 
@@ -94,6 +129,14 @@ export default function Dashboard() {
     return `${day}/${month}`;
   };
 
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <p className="text-gray-600">Carregando dados...</p>
+      </div>
+    );
+  }
+
   return (
     <div>
       <h1 className="text-3xl font-extrabold text-gray-800 mb-1">Dashboard</h1>
@@ -101,7 +144,7 @@ export default function Dashboard() {
 
       {/* Estatísticas de membros */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-        <div className="bg-white rounded-xl shadow-md p-5 border-l-4 bg-blue-500">
+        <div className="bg-white rounded-xl shadow-md p-5 border-l-4 border-blue-500">
           <div className="flex items-center justify-between mb-3">
             <div className="bg-blue-500 rounded-lg flex items-center justify-center text-white w-10 h-10">
               <Users className="w-6 h-6" />
@@ -112,7 +155,7 @@ export default function Dashboard() {
             </div>
           </div>
         </div>
-        <div className="bg-white rounded-xl shadow-md p-5 border-l-4 bg-green-500">
+        <div className="bg-white rounded-xl shadow-md p-5 border-l-4 border-green-500">
           <div className="flex items-center justify-between mb-3">
             <div className="bg-green-500 rounded-lg flex items-center justify-center text-white w-10 h-10">
               <Users className="w-6 h-6" />
@@ -123,7 +166,7 @@ export default function Dashboard() {
             </div>
           </div>
         </div>
-        <div className="bg-white rounded-xl shadow-md p-5 border-l-4 bg-gray-500">
+        <div className="bg-white rounded-xl shadow-md p-5 border-l-4 border-gray-500">
           <div className="flex items-center justify-between mb-3">
             <div className="bg-gray-500 rounded-lg flex items-center justify-center text-white w-10 h-10">
               <Users className="w-6 h-6" />
@@ -134,7 +177,7 @@ export default function Dashboard() {
             </div>
           </div>
         </div>
-        <div className="bg-white rounded-xl shadow-md p-5 border-l-4 bg-orange-500">
+        <div className="bg-white rounded-xl shadow-md p-5 border-l-4 border-orange-500">
           <div className="flex items-center justify-between mb-3">
             <div className="bg-orange-500 rounded-lg flex items-center justify-center text-white w-10 h-10">
               <Users className="w-6 h-6" />
@@ -154,7 +197,7 @@ export default function Dashboard() {
             <div className="bg-pink-500 rounded-lg p-2 text-white">
               <Cake className="w-6 h-6" />
             </div>
-            <h2 className="text-xl font-bold text-gray-800"> Aniversariantes do Mês</h2>
+            <h2 className="text-xl font-bold text-gray-800">Aniversariantes do Mês</h2>
           </div>
           {birthdays.length === 0 ? (
             <p className="text-gray-600">Nenhum aniversariante este mês.</p>
@@ -179,7 +222,7 @@ export default function Dashboard() {
             <div className={`rounded-lg p-2 ${financeStats.balance >= 0 ? 'bg-green-500' : 'bg-red-500'} text-white`}>
               <DollarSign className="w-6 h-6" />
             </div>
-            <h2 className="text-xl font-bold text-gray-800"> Finanças do Mês</h2>
+            <h2 className="text-xl font-bold text-gray-800">Finanças do Mês</h2>
           </div>
           <div className="grid grid-cols-3 gap-4">
             <div className="text-center">
