@@ -105,7 +105,7 @@ export default function Members() {
           className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition"
         >
           <Plus className="w-5 h-5" />
-          + Novo Membro
+          Novo Membro
         </button>
       </div>
 

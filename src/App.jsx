@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useAuth } from './hooks/useAuth';
@@ -34,10 +34,15 @@ function AppContent() {
           element={
             user ? (
               <>
+                {/* Header fixo no topo */}
                 <Header user={user} sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
+                
+                {/* Sidebar fixa à esquerda (abaixo do header) */}
                 <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
-                <main className={`p-4 transition-all duration-300 ${sidebarOpen ? 'ml-0' : 'ml-0 md:ml-64'} pt-20`}>
-                  <div className="max-w-7xl mx-auto">
+                
+                {/* Conteúdo principal - ajustado para não ficar sob o header e ao lado da sidebar */}
+                <main className="pt-20 md:pl-64 min-h-screen bg-gray-50 transition-all duration-300">
+                  <div className="max-w-7xl mx-auto p-6">
                     <Routes>
                       <Route path="/" element={<Dashboard />} />
                       <Route path="/members" element={<Members />} />
