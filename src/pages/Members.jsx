@@ -39,7 +39,7 @@ export default function Members() {
       await memberService.create(member);
       toast.success('Membro adicionado com sucesso!');
       setModal(null);
-      loadMembers(); // ← Isso recarrega a lista após salvar
+      loadMembers(); // Recarrega a lista após salvar
     } catch (error) {
       toast.error('Erro ao adicionar: ' + error.message);
     } finally {
@@ -54,7 +54,7 @@ export default function Members() {
       toast.success('Membro atualizado com sucesso!');
       setModal(null);
       setSelectedMember(null);
-      loadMembers(); // ← Isso recarrega a lista após salvar
+      loadMembers(); // Recarrega a lista após salvar
     } catch (error) {
       toast.error('Erro ao atualizar: ' + error.message);
     } finally {
@@ -71,7 +71,7 @@ export default function Members() {
       toast.success('Membro excluído com sucesso!');
       setSelectedMember(null);
       setModal(null);
-      loadMembers(); // ← Isso recarrega a lista após deletar
+      loadMembers(); // Recarrega a lista após deletar
     } catch (error) {
       toast.error('Erro ao excluir: ' + error.message);
     } finally {
@@ -105,7 +105,7 @@ export default function Members() {
           className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition"
         >
           <Plus className="w-5 h-5" />
-          Novo
+          + Novo Membro
         </button>
       </div>
 

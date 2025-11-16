@@ -92,9 +92,6 @@ export default function Finance() {
     return matchSearch && matchType && matchCategory && matchDate;
   });
 
-  // Adicione esta linha para ver os dados carregados
-  console.log("Transações carregadas:", transactions);
-
   // Função auxiliar para converter amount de string para número
   const parseAmount = (amount) => {
     if (!amount) return 0;
@@ -113,11 +110,6 @@ export default function Finance() {
     .reduce((sum, t) => sum + parseAmount(t.amount), 0);
 
   const balance = totalIncome - totalExpenses;
-
-  // Adicione esta linha para ver os valores calculados
-  console.log("Total Receitas:", totalIncome);
-  console.log("Total Despesas:", totalExpenses);
-  console.log("Saldo:", balance);
 
   // Categorias padrão
   const categories = [
